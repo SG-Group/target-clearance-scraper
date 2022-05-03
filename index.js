@@ -1,9 +1,13 @@
-import getItems from "./src/data-fetcher.js";
-import { connectToDatabase } from "./src/database-connector.js"
+import startScraping from "./src/script-logic.js";
+import { connectToDatabase } from "./src/db-connector.js"
 
 const main = async () => {
-    connectToDatabase();
-    getItems()
+    try {
+        connectToDatabase();
+        startScraping();
+    } catch (error) {
+        console.log("Oops! Something went wrong :( ", error);
+    }
 }
 
 main();
