@@ -17,6 +17,11 @@ const DB = sequelize.define("Items", {
     img: DataTypes.STRING
 })
 
+/**
+ * Processes raw product data and formats it according to the db specification
+ * @param {*} data raw product data
+ * @returns formatted product data
+ */
 const proccessItemsData = (data) => {
     let formattedItemsList = [];
     for (let item of data) {
@@ -36,6 +41,9 @@ const proccessItemsData = (data) => {
     return formattedItemsList
 }
 
+/**
+ * Connects to the local db
+ */
 export const connectToDatabase = () => {
     try {
         sequelize.authenticate();
@@ -45,6 +53,10 @@ export const connectToDatabase = () => {
     }
 }
 
+/**
+ * Persists a list of items to the local db
+ * @param {*} items raw product data
+ */
 export const saveItems = async (items) => {
     const formattedItems = proccessItemsData(items);
     for (let item of formattedItems) {
