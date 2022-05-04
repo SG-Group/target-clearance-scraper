@@ -18,7 +18,19 @@ const DB = sequelize.define("Items", {
 })
 
 /**
- * Processes raw product data and formats it according to the db specification
+ * Connects to the local db
+ */
+export const connectToDatabase = () => {
+    try {
+        sequelize.authenticate();
+        sequelize.sync();
+    } catch (error) {
+        console.log("Oops! Error connecting to the db :( ", error);
+    }
+}
+
+/**
+ * Processes raw product data and format it according to the db specification
  * @param {*} data raw product data
  * @returns formatted product data
  */
@@ -26,6 +38,7 @@ const proccessItemsData = (data) => {
     let formattedItemsList = [];
     for (let item of data) {
         const comparisonPrice = item.price.formatted_comparison_price || item.price.formatted_current_price;
+        // comparison price is a string so conversion is need
         const formattedComparisonPrice = parseFloat(comparisonPrice.replace(/[^\d.-]/g, ''))
         const calculatedDiscount = ((formattedComparisonPrice - item.price.current_retail) / formattedComparisonPrice) * 100
         formattedItemsList.push({
@@ -42,18 +55,6 @@ const proccessItemsData = (data) => {
 }
 
 /**
- * Connects to the local db
- */
-export const connectToDatabase = () => {
-    try {
-        sequelize.authenticate();
-        sequelize.sync();
-    } catch (error) {
-        console.log("Oops! Error connecting to the db :( ", error);
-    }
-}
-
-/**
  * Persists a list of items to the local db
  * @param {*} items raw product data
  */
@@ -62,6 +63,10 @@ export const saveItems = async (items) => {
     for (let item of formattedItems) {
         let itemAlreadyExists = await DB.findOne({ where: { dpci: item.dpci } })
         if (itemAlreadyExists && itemAlreadyExists.price !== item.price) {
+            /**
+             * Updates item if it already exists in db and
+             * saves last price to lastUpdatedPrice
+             */
             await itemAlreadyExists.update({
                 dpci: item.dpci,
                 name: item.name,

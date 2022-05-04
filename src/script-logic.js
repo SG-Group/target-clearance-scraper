@@ -8,6 +8,7 @@ const startScraping = async () => {
         const items = await getItems(itemOffset)
         await saveItems(items);
     }
+    startScraping();
 }
 
 export default startScraping;
