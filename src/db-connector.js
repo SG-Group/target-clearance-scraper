@@ -11,8 +11,8 @@ const DB = sequelize.define("Items", {
     name: DataTypes.STRING,
     price: DataTypes.REAL,
     //lastUpdatedPrice: DataTypes.REAL,
-    oldPrice: DataTypes.REAL,
-    discount: DataTypes.NUMBER,
+    oldPrice: DataTypes.STRING,
+    discount: DataTypes.STRING,
     url: DataTypes.STRING,
     img: DataTypes.STRING
 })
@@ -39,14 +39,18 @@ const proccessItemsData = (data) => {
     for (let item of data) {
         const comparisonPrice = item.price.formatted_comparison_price || item.price.formatted_current_price;
         // comparison price is a string so conversion is need
-        const formattedComparisonPrice = parseFloat(comparisonPrice.replace(/[^\d.-]/g, ''))
-        const calculatedDiscount = ((formattedComparisonPrice - item.price.current_retail) / formattedComparisonPrice) * 100
+        let formattedComparisonPrice = parseFloat(comparisonPrice.replace(/[^\d.-]/g, ''))
+        let calculatedDiscount = (((formattedComparisonPrice - item.price.current_retail) / formattedComparisonPrice) * 100).toFixed(0)
+        if (!Number.isFinite(formattedComparisonPrice)) {
+            formattedComparisonPrice = "Location Specific"
+            calculatedDiscount = "Location Specific"
+        }
         formattedItemsList.push({
             sku: item.item.dpci,
             name: item.item.product_description.title.replace(/(&).*?(;)/g, ""),
             price: item.price.current_retail.toFixed(2),
-            oldPrice: formattedComparisonPrice.toFixed(2),
-            discount: calculatedDiscount.toFixed(0),
+            oldPrice: formattedComparisonPrice,
+            discount: calculatedDiscount,
             url: item.item.enrichment.buy_url,
             img: item.item.enrichment.images.primary_image_url
         })
