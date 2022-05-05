@@ -43,7 +43,7 @@ const proccessItemsData = (data) => {
         const calculatedDiscount = ((formattedComparisonPrice - item.price.current_retail) / formattedComparisonPrice) * 100
         formattedItemsList.push({
             dpci: item.item.dpci,
-            name: item.item.product_description.title,
+            name: item.item.product_description.title.replace(/(&).*?(;)/g, ""),
             price: item.price.current_retail.toFixed(2),
             originalPrice: formattedComparisonPrice.toFixed(2),
             discount: calculatedDiscount.toFixed(0),
