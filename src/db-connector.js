@@ -62,7 +62,7 @@ export const saveItems = async (items) => {
     const formattedItems = proccessItemsData(items);
     for (let item of formattedItems) {
         let itemAlreadyExists = await DB.findOne({ where: { sku: item.sku } })
-        if (itemAlreadyExists && itemAlreadyExists.price !== item.price) {
+        if (itemAlreadyExists && itemAlreadyExists.price != item.price) {
             /**
              * Updates item if it already exists in db and
              * saves last price to lastUpdatedPrice
