@@ -3,6 +3,7 @@ import { connectToDatabase } from "./src/db-connector.js"
 
 const main = async () => {
     try {
+        console.log("Starting Scraping!")
         connectToDatabase();
         startScraping();
     } catch (error) {

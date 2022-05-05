@@ -6,6 +6,7 @@ const startScraping = async () => {
     // Max product offset for the Target API is 1199
     for (let itemOffset = 0; itemOffset < 1199; itemOffset += 28) {
         const items = await getItems(itemOffset)
+        console.log("Products Found")
         await saveItems(items);
     }
     startScraping();
