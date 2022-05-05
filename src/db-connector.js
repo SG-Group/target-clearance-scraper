@@ -7,11 +7,11 @@ const sequelize = new Sequelize({
 })
 
 const DB = sequelize.define("Items", {
-    dpci: DataTypes.STRING,
+    sku: DataTypes.STRING,
     name: DataTypes.STRING,
     price: DataTypes.REAL,
-    lastUpdatedPrice: DataTypes.REAL,
-    originalPrice: DataTypes.REAL,
+    //lastUpdatedPrice: DataTypes.REAL,
+    oldPrice: DataTypes.REAL,
     discount: DataTypes.NUMBER,
     url: DataTypes.STRING,
     img: DataTypes.STRING
@@ -42,10 +42,10 @@ const proccessItemsData = (data) => {
         const formattedComparisonPrice = parseFloat(comparisonPrice.replace(/[^\d.-]/g, ''))
         const calculatedDiscount = ((formattedComparisonPrice - item.price.current_retail) / formattedComparisonPrice) * 100
         formattedItemsList.push({
-            dpci: item.item.dpci,
+            sku: item.item.dpci,
             name: item.item.product_description.title.replace(/(&).*?(;)/g, ""),
             price: item.price.current_retail.toFixed(2),
-            originalPrice: formattedComparisonPrice.toFixed(2),
+            oldPrice: formattedComparisonPrice.toFixed(2),
             discount: calculatedDiscount.toFixed(0),
             url: item.item.enrichment.buy_url,
             img: item.item.enrichment.images.primary_image_url
@@ -61,18 +61,18 @@ const proccessItemsData = (data) => {
 export const saveItems = async (items) => {
     const formattedItems = proccessItemsData(items);
     for (let item of formattedItems) {
-        let itemAlreadyExists = await DB.findOne({ where: { dpci: item.dpci } })
+        let itemAlreadyExists = await DB.findOne({ where: { sku: item.sku } })
         if (itemAlreadyExists && itemAlreadyExists.price !== item.price) {
             /**
              * Updates item if it already exists in db and
              * saves last price to lastUpdatedPrice
              */
             await itemAlreadyExists.update({
-                dpci: item.dpci,
+                sku: item.dpci,
                 name: item.name,
                 price: item.price,
-                lastUpdatedPrice: itemAlreadyExists.price,
-                originalPrice: item.originalPrice,
+                //lastUpdatedPrice: itemAlreadyExists.price,
+                oldPrice: item.originalPrice,
                 discount: item.discount,
                 url: item.url,
                 img: item.img,
